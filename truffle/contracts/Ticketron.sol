@@ -45,11 +45,15 @@ contract Ticketron {
         }
     }
 
-    function getPrice() public returns (uint) {
+    function getPrice() public view returns (uint) {
         return ticketPrice;
     }
 
-    function getTicketsRemaining() public returns (uint16) {
+    function getTicketsRemaining() public view returns (uint16) {
         return maxTickets - ticketsSold;
+    }
+
+    function getOwner() public view returns (address) {
+      return owner;
     }
 }

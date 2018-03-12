@@ -97,7 +97,6 @@ const startListening = () => {
   // start listening (and create a 'server' object representing our server)
   const server = app.listen(PORT, () => {
     console.log(`Mixing it up on port ${PORT}`)
-
     // Connect to the chain (local or otherwise)
     if (typeof web3 !== 'undefined') {
       console.log('web 3 detected from external source')

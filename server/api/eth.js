@@ -23,6 +23,24 @@ router.get('/price', (req, res, next) => {
   })
 })
 
+router.get('/owner', (req, res, next) => {
+  console.log('------ Getting Owner ------');
+
+  truffleConnect.getOwner(owner => {
+    console.log(owner);
+    res.json(owner);
+  })
+})
+
+router.get('/event', (req, res, next) => {
+  console.log('------ Getting EventName ------');
+
+  truffleConnect.getEventName(event => {
+    console.log(event);
+    res.json(event);
+  })
+})
+
 router.get('/ticket/count', (req, res, next) => {
   console.log('------ Getting Ticket Count ------');
 
@@ -36,9 +54,29 @@ router.post('/ticket/buy', (req, res, next) => {
   console.log('------ Buying Ticket ------');
   const buyer = req.body.buyer;
   const value = req.body.value;
-
-  truffleConnect.buyTicket((buyer, value, (ticket) => {
+  console.log(buyer)
+  truffleConnect.buyTicket(buyer, value, (ticket) => {
     console.log(ticket);
     res.json(ticket);
-  }))
+  })
+})
+
+router.post('/ticket/use', (req, res, next) => {
+  console.log('------ Using Ticket -------');
+  const ticket = req.body.ticket;
+  const user = req.body.user;
+
+  truffleConnect.useTicket(user, ticket, (message) => {
+    res.send(message)
+  })
+})
+
+router.get('/ticket/:key', (req, res, next) => {
+  console.log('------ checking Ticket -------');
+  const key = req.params.key;
+
+  truffleConnect.getTicket(key, (ticket) => {
+    console.log(ticket)
+    res.json(ticket)
+  })
 })

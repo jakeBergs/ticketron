@@ -6,13 +6,13 @@ contract Ticketron {
         bool used;
     }
 
-    mapping(bytes32 => Ticket) public tickets;
+    mapping(bytes32 => Ticket) tickets;
 
     string eventName;
     uint ticketPrice;
     uint16 maxTickets;
     uint16 ticketsSold;
-    address owner;
+    address venueOwner;
 
     event TicketHash(bytes32 key);
     event ProcessingError(string err);
@@ -22,34 +22,47 @@ contract Ticketron {
         ticketPrice = price;
         maxTickets = capacity;
         ticketsSold = 0;
-        owner = msg.sender;
+        venueOwner = msg.sender;
     }
 
     function buyTicket() payable public returns (bytes32 ticketKey) {
-        if(msg.value == ticketPrice && ticketsSold < maxTickets) {
+        if (msg.value == ticketPrice && ticketsSold < maxTickets) {
             //create ticket
             ticketKey = keccak256(msg.sender);
             tickets[ticketKey] = Ticket(msg.sender, false);
             // transfer funds
-            owner.transfer(ticketPrice);
+            venueOwner.transfer(ticketPrice);
             ticketsSold++;
             TicketHash(ticketKey);
         }
     }
 
-    function useTicket(bytes32 key) public {
-        if(tickets[key].owner == msg.sender && !tickets[key].used) {
+    function useTicket(bytes32 key) public returns (bool) {
+        if (tickets[key].owner == msg.sender && !tickets[key].used) {
             tickets[key].used = true;
+            return true;
         } else {
-            revert();
+            return false;
         }
     }
 
-    function getPrice() public returns (uint) {
+    function getPrice() public view returns (uint) {
         return ticketPrice;
     }
 
-    function getTicketsRemaining() public returns (uint16) {
+    function getTicketsRemaining() public view returns (uint16) {
         return maxTickets - ticketsSold;
+    }
+
+    function getOwner() public view returns (address) {
+      return venueOwner;
+    }
+
+    function getEventName() public view returns (string) {
+        return eventName;
+    }
+
+    function getTicket(bytes32 key) public view returns (bool) {
+      return tickets[key].used;
     }
 }

@@ -1,4 +1,6 @@
 const path = require('path')
+const Web3 = require('web3')
+const truffleConnect = require('../truffle/connect')
 const express = require('express')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
@@ -55,6 +57,15 @@ const createApp = () => {
   app.use('/auth', require('./auth'))
   app.use('/api', require('./api'))
 
+  // app.get('/accounts', (req, res, next) => {
+  //   console.log('----- Getting Accounts -------')
+  //   // console.log('-----------_-_-_____', truffleConnect)
+  //   truffleConnect.fetchAccounts(accts => {
+  //     console.log(accts)
+  //   })
+  //   // .catch(next)
+  // })
+
   // static file-serving middleware
   app.use(express.static(path.join(__dirname, '..', 'public')))
 
@@ -84,7 +95,19 @@ const createApp = () => {
 
 const startListening = () => {
   // start listening (and create a 'server' object representing our server)
-  const server = app.listen(PORT, () => console.log(`Mixing it up on port ${PORT}`))
+  const server = app.listen(PORT, () => {
+    console.log(`Mixing it up on port ${PORT}`)
+    // Connect to the chain (local or otherwise)
+    if (typeof web3 !== 'undefined') {
+      console.log('web 3 detected from external source')
+      truffleConnect.web3 = new Web3(web3.currentProvider)
+    } else {
+      console.log('No web3 detected. creating new web3 on local network for truffle Connect')
+      truffleConnect.web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:7545'));
+      // console.log(truffleConnect.web3);
+    }
+
+  })
 
   // set up our socket control center
   const io = socketio(server)
